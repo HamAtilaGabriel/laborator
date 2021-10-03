@@ -1,0 +1,6 @@
+Una dintre aplicatile carele folosesc cel mai des si care se incadreaza la categoria SaaS este Gmail.
+Aceasta este o aplicatie care ruleaza pe serverele celor de la Google, utilizandu-le bazele de date, 
+retelele si resursele informatice. Aplicatia este scrisa in Java, C++(back-end) si in JavaScript(UI). 
+Aceasta se foloseste de un browser web pentru a rula. Ca si protocol de securitate si de comunicare 
+foloseste HTTPS inca de cand o fost lansata. De asemenea dispune si de Third-party encryption si de 
+Two-step Verification.
