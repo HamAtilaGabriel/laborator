@@ -1,7 +1,9 @@
+﻿using Azure.Storage.Queues;
 using L04.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -26,7 +28,7 @@ namespace L04.Repository
 
         public StudentsRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetValue<string>("DefaultEndpointsProtocol=https;AccountName=hamatilal04;AccountKey=BXdnLDm6WcBHP9I3rrK5hl5+DdR4Lu3AUAKb2LJ/UdbR9VLXSWycJg5y8Fai/qhOAKjsuhlOYjL8Hzzsb+Uzcw==;EndpointSuffix=core.windows.net").ToString();
+            _connectionString = configuration.GetValue(typeof(string), "AzureStorageConnectionString").ToString();
             Task.Run(async () => { await InitializeTable(); })
                 .GetAwaiter()
                 .GetResult();
@@ -34,8 +36,19 @@ namespace L04.Repository
 
         public async Task CreateStudent(StudentEntity student)
         {
-            var insertOperation = TableOperation.Insert(student);
-            await _studentsTable.ExecuteAsync(insertOperation);
+            //var insertOperation = TableOperation.Insert(student);
+            //await _studentsTable.ExecuteAsync(insertOperation);
+            var jsonStudent = JsonConvert.SerializeObject(student);
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(jsonStudent);
+            var base64String = System.Convert.ToBase64String(plainTextBytes);
+
+            QueueClient queueClient = new QueueClient(
+                _connectionString,
+                "students-queue"
+                );
+            queueClient.CreateIfNotExists();
+
+            await queueClient.SendMessageAsync(base64String);
         }
 
         public async Task UpdateStudent(JObject update)
